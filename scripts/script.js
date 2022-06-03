@@ -77,7 +77,7 @@ const Player = function(marker, turn, playerName) {
     }
     _turn = !_turn;  // finish the player's turn
     if (gameController.checkWinner(_marker)) { // then check if player won
-
+      gameController.declareWinner(_name);
     }
   }
 
@@ -106,6 +106,7 @@ const gameController = (function () {
 
   let _playerOne;
   let _playerTwo;
+  let _gameRunning = true;
 
   // object containing all 8 win patterns
   // here we can see that the corner squares have 3 possible
@@ -136,6 +137,10 @@ const gameController = (function () {
 
     // this function is called when a square is clicked
   const playerMove = function(index) {
+    // if game has ended, don't let players make any moves
+    if (_gameRunning === false) {
+      return;
+    }
     _playerOne.makeMove(index);
     _playerTwo.makeMove(index);
   }
@@ -161,7 +166,13 @@ const gameController = (function () {
     return false;
   }
 
-  return {startGame, playerMove, checkWinner, setPlayerNames};
+  const declareWinner = function(playerName) {
+    const info = document.querySelector(".info-box h1");
+    info.textContent = `${playerName} wins!`;
+    _gameRunning = false;
+  }
+
+  return {startGame, playerMove, checkWinner, setPlayerNames, declareWinner};
 })();
 
 
