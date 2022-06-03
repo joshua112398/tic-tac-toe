@@ -56,7 +56,14 @@ const Gameboard = (function() {
     return _squares;
   }
 
-  return {displayBoard, markBoard, eraseBoard, getBoard};
+  // used to reset the game
+  const resetBoardArray = function() {
+    for (let i = 0; i < _squares.length; i++) {
+      _squares[i] = "";
+    }
+  }
+
+  return {displayBoard, markBoard, eraseBoard, getBoard, resetBoardArray};
 
 })();
 
@@ -84,14 +91,12 @@ const Player = function(marker, turn, playerName) {
   const displayName = function() {
     let player;
     if (marker === "X") {
-      player = ".playerOne-box";
+      player = ".playerOne-name";
     } else {
-      player = ".playerTwo-box";
+      player = ".playerTwo-name";
     }
-    const nameBox = document.querySelector(player);
-    const nameInfo = document.createElement("h2");
+    const nameInfo = document.querySelector(player);
     nameInfo.textContent = playerName;
-    nameBox.appendChild(nameInfo);
 
   }
 
@@ -133,6 +138,19 @@ const gameController = (function () {
     Gameboard.displayBoard();
     _playerOne.displayName();
     _playerTwo.displayName();
+    // if restart button is clicked, restart game
+    const reset = document.querySelector(".info-box button");
+    reset.addEventListener("click", restartGame);
+  }
+
+  const restartGame = function() {
+    // Restarts the game, popping up the start screen again
+    Gameboard.eraseBoard();
+    Gameboard.resetBoardArray();
+    const info = document.querySelector(".info-box h1");
+    info.textContent = "Tic Tac Toe";
+    _gameRunning = true;
+    startScreen.showStartScreen();
   }
 
     // this function is called when a square is clicked
@@ -189,12 +207,12 @@ const startScreen = (function () {
     const playerOne = document.querySelector("#playerOne").value;
     const playerTwo = document.querySelector("#playerTwo").value;
     hideStartScreen();
-    gameController.setPlayerNames(playerOne, playerTwo)
+    gameController.setPlayerNames(playerOne, playerTwo);
     gameController.startGame();
   });
 
   const showStartScreen = function () {
-    _screen.style.display = "auto";
+    _screen.style.display = "flex";
   }
 
   const hideStartScreen = function () {
