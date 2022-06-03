@@ -1,13 +1,22 @@
 // GAMEBOARD MODULE
 const Gameboard = (function() {
-  const squares = ["X", "X", "O", "O", "O", "", "X", "O", "O"];
+  const squares = ["", "", "", "", "", "", "", "", ""];
 
   // Display the updated board
   const displayBoard = function() {
     const board = document.querySelector(".board");
+
+    let i = 0;
     for (const square of squares) {
       const div = document.createElement("div");
       div.classList.add("square");
+      div.setAttribute("data-index", i)
+      // if square is empty, add a click event listener
+      if (square === "") {
+        div.addEventListener('click', () => {
+          gameController.playerMove(div.dataset.index);
+        });
+      }
       const img = document.createElement("img");
       let imgSource;
       if (square !== "") {
@@ -20,6 +29,7 @@ const Gameboard = (function() {
         div.appendChild(img);
       }
       board.appendChild(div);
+      i += 1;
     }
   }
 
@@ -55,28 +65,36 @@ const Player = function(marker, turn) {
 
   // Make a move, and mark the board using markBoard function
   const makeMove = function(index) {
-    Gameboard.markBoard(index, _marker)
+    if (_turn === true) {
+      Gameboard.markBoard(index, _marker)
+    }
     _turn = !_turn;  // finish the player's turn
   }
 
-  return {getMarker};
+  return {makeMove};
 };
 
 // ------------------------------------------ //
 
 // GAME CONTROL FLOW MODULE
-const  gameController = (function () {
+const gameController = (function () {
+
+  let _playerOne = Player("X", true);
+  let _playerTwo = Player("O", false);
+
 
   const startGame = function() {
     // Starts the game, spawning the board and players
     Gameboard.displayBoard();
-    const playerOne = Player("X", true);
-    const playerTwo = Player("O", false);
-
-    console.log(playerOne.getMarker());
   }
 
-  return {startGame};
+    // this function is called when a square is clicked
+  const playerMove = function(index) {
+    _playerOne.makeMove(index);
+    _playerTwo.makeMove(index);
+  }
+
+  return {startGame, playerMove};
 })();
 
 
