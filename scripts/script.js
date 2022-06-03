@@ -81,7 +81,21 @@ const Player = function(marker, turn, playerName) {
     }
   }
 
-  return {makeMove};
+  const displayName = function() {
+    let player;
+    if (marker === "X") {
+      player = ".playerOne-box";
+    } else {
+      player = ".playerTwo-box";
+    }
+    const nameBox = document.querySelector(player);
+    const nameInfo = document.createElement("h2");
+    nameInfo.textContent = playerName;
+    nameBox.appendChild(nameInfo);
+
+  }
+
+  return {makeMove, displayName};
 };
 
 // ------------------------------------------ //
@@ -90,8 +104,8 @@ const Player = function(marker, turn, playerName) {
 // GAME CONTROL FLOW MODULE
 const gameController = (function () {
 
-  let _playerOne = Player("X", true);
-  let _playerTwo = Player("O", false);
+  let _playerOne;
+  let _playerTwo;
 
   // object containing all 8 win patterns
   // here we can see that the corner squares have 3 possible
@@ -108,9 +122,16 @@ const gameController = (function () {
     h: [6,7,8],
   }
 
+  const setPlayerNames = function(playerOne, playerTwo) {
+    _playerOne = Player("X", true, playerOne);
+    _playerTwo = Player("O", false, playerTwo);
+  }
+
   const startGame = function() {
     // Starts the game, spawning the board and players
     Gameboard.displayBoard();
+    _playerOne.displayName();
+    _playerTwo.displayName();
   }
 
     // this function is called when a square is clicked
@@ -140,12 +161,34 @@ const gameController = (function () {
     return false;
   }
 
-  return {startGame, playerMove, checkWinner};
+  return {startGame, playerMove, checkWinner, setPlayerNames};
 })();
 
 
-gameController.startGame();
+// ------------------------------------------ //
+// ------------------------------------------ //
 
+const startScreen = (function () {
 
-// checkForWinner()
-// - Checks for any winning solutions for either "X" or "O"
+  const _screen = document.querySelector(".startScreen");
+  const _start = document.querySelector("#start-button");
+
+  _start.addEventListener('click', (e) => {
+    e.preventDefault();
+    const playerOne = document.querySelector("#playerOne").value;
+    const playerTwo = document.querySelector("#playerTwo").value;
+    hideStartScreen();
+    gameController.setPlayerNames(playerOne, playerTwo)
+    gameController.startGame();
+  });
+
+  const showStartScreen = function () {
+    _screen.style.display = "auto";
+  }
+
+  const hideStartScreen = function () {
+    _screen.style.display = "none";
+  }
+
+  return {showStartScreen, hideStartScreen};
+})();
